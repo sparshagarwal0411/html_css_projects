@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FLAMES Game - Love Calculator</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #1a0033, #2d0040, #1a0033);
+            min-height: 100vh;
+            color: white;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* Floating Hearts Animation */
+        .heart {
+            position: absolute;
+            font-size: 20px;
+            color: #ff69b4;
+            animation: float 6s ease-in-out infinite;
+            opacity: 0.7;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) rotate(0deg); opacity: 0.7; }
+            50% { transform: translateY(-20px) rotate(180deg); opacity: 1; }
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            position: relative;
+            z-index: 10;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding-top: 30px;
+        }
+
+        .title {
+            font-size: 3.5rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+            background: linear-gradient(45deg, #ff69b4, #ff1493, #ff69b4);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-shadow: 0 0 30px rgba(255, 105, 180, 0.5);
+            animation: glow 2s ease-in-out infinite alternate;
+        }
+
+        @keyframes glow {
+            from { filter: drop-shadow(0 0 10px rgba(255, 105, 180, 0.5)); }
+            to { filter: drop-shadow(0 0 20px rgba(255, 105, 180, 0.8)); }
+        }
+
+        .subtitle {
+            font-size: 1.2rem;
+            color: #ff69b4;
+            opacity: 0.8;
+            margin-bottom: 20px;
+        }
+
+        .game-container {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 105, 180, 0.2);
+        }
+
+        .input-group {
+            margin-bottom: 25px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #ff69b4;
+        }
+
+        input[type="text"] {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid rgba(255, 105, 180, 0.3);
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        input[type="text"]:focus {
+            outline: none;
+            border-color: #ff69b4;
+            box-shadow: 0 0 15px rgba(255, 105, 180, 0.3);
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        input[type="text"]::placeholder {
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .play-btn {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(45deg, #ff1493, #ff69b4, #ff1493);
+            border: none;
+            border-radius: 10px;
+            color: white;
+            font-size: 1.2rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-top: 20px;
+        }
+
+        .play-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(255, 20, 147, 0.4);
+            background: linear-gradient(45deg, #ff0080, #ff69b4, #ff0080);
+        }
+
+        .play-btn:active {
+            transform: translateY(0);
+        }
+
+        .result-container {
+            margin-top: 30px;
+            text-align: center;
+            padding: 30px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            border: 1px solid rgba(255, 105, 180, 0.2);
+            display: none;
+            animation: fadeInUp 0.6s ease-out;
+        }
+
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .flames-display {
+            font-size: 4rem;
+            font-weight: 700;
+            margin-bottom: 20px;
+            letter-spacing: 8px;
+        }
+
+        .result-text {
+            font-size: 1.5rem;
+            margin-bottom: 10px;
+            color: #ff69b4;
+        }
+
+        .result-emoji {
+            font-size: 3rem;
+            margin: 20px 0;
+        }
+
+        .play-again-btn {
+            padding: 12px 30px;
+            background: transparent;
+            border: 2px solid #ff69b4;
+            border-radius: 25px;
+            color: #ff69b4;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 20px;
+        }
+
+        .play-again-btn:hover {
+            background: #ff69b4;
+            color: white;
+            transform: scale(1.05);
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 40px;
+            padding: 20px;
+            color: rgba(255, 105, 180, 0.7);
+        }
+
+        .footer a {
+            color: #ff69b4;
+            text-decoration: none;
+        }
+
+        /* Sparkle animation */
+        .sparkle {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: #ff69b4;
+            border-radius: 50%;
+            animation: sparkle 2s ease-in-out infinite;
+        }
+
+        @keyframes sparkle {
+            0%, 100% { opacity: 0; transform: scale(0); }
+            50% { opacity: 1; transform: scale(1); }
+        }
+    </style>
+</head>
+<body>
+    <!-- Floating Hearts -->
+    <div class="heart" style="top: 10%; left: 10%; animation-delay: 0s;">💖</div>
+    <div class="heart" style="top: 20%; left: 80%; animation-delay: 1s;">💕</div>
+    <div class="heart" style="top: 60%; left: 5%; animation-delay: 2s;">💗</div>
+    <div class="heart" style="top: 70%; left: 90%; animation-delay: 3s;">💘</div>
+    <div class="heart" style="top: 30%; left: 70%; animation-delay: 1.5s;">💝</div>
+    <div class="heart" style="top: 80%; left: 20%; animation-delay: 2.5s;">💓</div>
+    <div class="heart" style="top: 40%; left: 95%; animation-delay: 0.5s;">💖</div>
+    <div class="heart" style="top: 15%; left: 50%; animation-delay: 3.5s;">💕</div>
+
+    <div class="container">
+        <div class="header">
+            <h1 class="title">FLAMES</h1>
+            <p class="subtitle">💖 Discover Your Love Destiny 💖</p>
+        </div>
+
+        <div class="game-container">
+            <div class="input-group">
+                <label for="name1">💕 First Person's Name</label>
+                <input type="text" id="name1" placeholder="Enter first name..." maxlength="20">
+            </div>
+            
+            <div class="input-group">
+                <label for="name2">💕 Second Person's Name</label>
+                <input type="text" id="name2" placeholder="Enter second name..." maxlength="20">
+            </div>
+            
+            <button class="play-btn" onclick="playFlamesGame()">
+                💖 Calculate Love Destiny 💖
+            </button>
+
+            <div class="result-container" id="resultContainer">
+                <div class="flames-display" id="flamesDisplay"></div>
+                <div class="result-text" id="resultText"></div>
+                <div class="result-emoji" id="resultEmoji"></div>
+                <div id="resultDescription"></div>
+                <button class="play-again-btn" onclick="resetGame()">Play Again</button>
+            </div>
+        </div>
+
+        <div class="footer">
+            <p>💖 Made with love by <a href="#"><strong>BrainStormer</strong></a> group 💖</p>
+            <p>Founded by <strong style="color: #ff1493;">SPARSH</strong></p>
+            <p><em>Discover the magic of love through FLAMES!</em></p>
+        </div>
+    </div>
+
+    <script>
+        // Create sparkles
+        function createSparkles() {
+            for (let i = 0; i < 20; i++) {
+                setTimeout(() => {
+                    const sparkle = document.createElement('div');
+                    sparkle.className = 'sparkle';
+                    sparkle.style.left = Math.random() * 100 + '%';
+                    sparkle.style.top = Math.random() * 100 + '%';
+                    sparkle.style.animationDelay = Math.random() * 2 + 's';
+                    document.body.appendChild(sparkle);
+                    
+                    setTimeout(() => sparkle.remove(), 2000);
+                }, i * 100);
+            }
+        }
+
+        // Create sparkles periodically
+        setInterval(createSparkles, 3000);
+        createSparkles(); // Initial sparkles
+
+        function playFlamesGame() {
+            const name1 = document.getElementById('name1').value.trim().toUpperCase();
+            const name2 = document.getElementById('name2').value.trim().toUpperCase();
+
+            if (!name1 || !name2) {
+                alert('💕 Please enter both names to discover your love destiny! 💕');
+                return;
+            }
+
+            if (name1 === name2) {
+                alert('💖 Please enter different names! 💖');
+                return;
+            }
+
+            // Calculate FLAMES
+            const result = calculateFlames(name1, name2);
+            displayResult(result, name1, name2);
+            
+            // Create celebration sparkles
+            createSparkles();
+        }
+
+        function calculateFlames(name1, name2) {
+            const l1 = name1.length;
+            const l2 = name2.length;
+            
+            let commonChars = [];
+            
+            if (l1 >= l2) {
+                for (let i = 0; i < l1; i++) {
+                    if (name2.includes(name1[i])) {
+                        commonChars.push(name1[i]);
+                    }
+                }
+            } else {
+                for (let i = 0; i < l2; i++) {
+                    if (name1.includes(name2[i])) {
+                        commonChars.push(name2[i]);
+                    }
+                }
+            }
+            
+            const uniqueCommon = [...new Set(commonChars)];
+            const commonCount = uniqueCommon.length;
+            
+            const totalLetters = l1 + l2;
+            const countValue = totalLetters - (2 * commonCount);
+            
+            const flames = ["F", "L", "A", "M", "E", "S"];
+            let index = 0;
+            
+            while (flames.length > 1) {
+                index = (index + countValue - 1) % flames.length;
+                flames.splice(index, 1);
+            }
+            
+            return flames[0];
+        }
+
+        function displayResult(result, name1, name2) {
+            const resultContainer = document.getElementById('resultContainer');
+            const flamesDisplay = document.getElementById('flamesDisplay');
+            const resultText = document.getElementById('resultText');
+            const resultEmoji = document.getElementById('resultEmoji');
+            const resultDescription = document.getElementById('resultDescription');
+
+            let displayText, emoji, description, flamesColored;
+
+            switch(result) {
+                case 'F':
+                    flamesColored = '<span style="color: #00ff00;">F</span><span style="color: #ff1493;">LAMES</span>';
+                    displayText = 'FRIENDS';
+                    emoji = '💔😢';
+                    description = '<p style="color: #ffff99;">Friend Zoned! But hey, friendship is beautiful too! 💛</p>';
+                    break;
+                case 'L':
+                    flamesColored = '<span style="color: #ff1493;">F</span><span style="color: #00ff00;">L</span><span style="color: #ff1493;">AMES</span>';
+                    displayText = 'LOVERS';
+                    emoji = '❤️💕';
+                    description = '<p style="color: #ff69b4;">Perfect Match! You two are meant to be together! 💖</p>';
+                    break;
+                case 'A':
+                    flamesColored = '<span style="color: #ff1493;">FL</span><span style="color: #00ff00;">A</span><span style="color: #ff1493;">MES</span>';
+                    displayText = 'AFFECTIONATE';
+                    emoji = '💗😍';
+                    description = '<p style="color: #ff69b4;">Someone\'s in the crush phase! Love is in the air! 💫</p>';
+                    break;
+                case 'M':
+                    flamesColored = '<span style="color: #ff1493;">FLA</span><span style="color: #00ff00;">M</span><span style="color: #ff1493;">ES</span>';
+                    displayText = 'MARRIAGE';
+                    emoji = '🤵💍👰';
+                    description = '<p style="color: #ff69b4;">Wedding bells are ringing! Get ready to tie the knot! 💒</p>';
+                    break;
+                case 'E':
+                    flamesColored = '<span style="color: #ff1493;">FLAM</span><span style="color: #00ff00;">E</span><span style="color: #ff1493;">S</span>';
+                    displayText = 'ENEMIES';
+                    emoji = '💔😤';
+                    description = '<p style="color: #ff6b6b;">Opposite poles! But sometimes opposites attract later! 🔥</p>';
+                    break;
+                case 'S':
+                    flamesColored = '<span style="color: #ff1493;">FLAME</span><span style="color: #00ff00;">S</span>';
+                    displayText = 'SIBLINGS';
+                    emoji = '👫😊';
+                    description = '<p style="color: #87ceeb;">Brother-Sister bond! A special platonic connection! 💙</p>';
+                    break;
+            }
+
+            flamesDisplay.innerHTML = flamesColored;
+            resultText.textContent = displayText;
+            resultEmoji.textContent = emoji;
+            resultDescription.innerHTML = description + 
+                `<p style="margin-top: 20px; color: #ff69b4;">💖 Thanks for playing, ${name1} and ${name2}! 💖</p>`;
+
+            resultContainer.style.display = 'block';
+            resultContainer.scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function resetGame() {
+            document.getElementById('name1').value = '';
+            document.getElementById('name2').value = '';
+            document.getElementById('resultContainer').style.display = 'none';
+            document.getElementById('name1').focus();
+        }
+
+        // Allow Enter key to play game
+        document.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                playFlamesGame();
+            }
+        });
+
+        // Focus on first input when page loads
+        window.onload = function() {
+            document.getElementById('name1').focus();
+        };
+    </script>
+</body>
+</html>

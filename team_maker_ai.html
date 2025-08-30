@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Team Shuffler Pro</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 20px;
+      background: linear-gradient(-45deg, #000000, #1a1a1a, #111111, #2b2b2b);
+      background-size: 400% 400%;
+      animation: bgMove 15s ease infinite;
+      font-family: 'Segoe UI', sans-serif;
+      color: #ffffff;
+      text-align: center;
+    }
+
+    @keyframes bgMove {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    h1 {
+      font-size: 36px;
+      margin-bottom: 20px;
+      color: #00ffcc;
+      text-shadow: 0 0 10px #000;
+    }
+
+    label {
+      display: block;
+      margin-top: 20px;
+      margin-bottom: 5px;
+      font-weight: bold;
+    }
+
+    input[type="text"], input[type="color"], select, button {
+      margin: 10px auto;
+      display: block;
+      width: 80%;
+      max-width: 400px;
+      border-radius: 8px;
+      border: none;
+      padding: 12px;
+      font-size: 16px;
+      box-shadow: 0 0 10px rgba(255, 255, 255, 0.1);
+    }
+
+    input[type="text"] {
+      background-color: white;
+      color: black;
+    }
+
+    select, input[type="color"] {
+      background-color: #222;
+      color: #fff;
+    }
+
+    button {
+      background-color: #00cc66;
+      color: white;
+      cursor: pointer;
+      transition: background-color 0.3s, transform 0.2s;
+    }
+
+    button:hover {
+      background-color: #00aa55;
+      transform: scale(1.05);
+    }
+
+    .team {
+      margin: 15px auto;
+      padding: 10px;
+      width: 90%;
+      max-width: 500px;
+      background-color: rgba(0, 0, 0, 0.7);
+      border-radius: 10px;
+      box-shadow: 0 0 8px rgba(0, 255, 204, 0.2);
+    }
+
+    #output {
+      margin-top: 20px;
+    }
+
+    .footer {
+      margin-top: 40px;
+      font-size: 14px;
+      color: #ccc;
+    }
+
+    #playersTitle {
+      font-size: 24px;
+      margin-top: 30px;
+      color: #00ffcc;
+    }
+
+    #playersList {
+      margin: 10px auto 30px auto;
+      font-size: 16px;
+      width: 90%;
+      max-width: 600px;
+    }
+
+    .name-badge {
+      display: inline-block;
+      margin: 5px;
+      padding: 5px 10px;
+      border-radius: 8px;
+      font-weight: bold;
+      cursor: pointer;
+      animation: popin 0.3s ease;
+      color: white;
+    }
+
+    @keyframes popin {
+      0% { transform: scale(0.5); opacity: 0; }
+      100% { transform: scale(1); opacity: 1; }
+    }
+
+    .team-inputs {
+      margin-top: 20px;
+    }
+
+    .team-color-label {
+      color: #ccc;
+      margin-top: 10px;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Team Shuffler Pro</h1>
+
+  <label>Enter player name:</label>
+  <input type="text" id="nameInput" placeholder="e.g., Sparsh" onkeydown="handleEnter(event)">
+  <button onclick="addName()">Add Player</button>
+
+  <label>Divide into how many teams?</label>
+  <select id="teamCount" onchange="showTeamInputs()">
+    <option value="2">2 teams</option>
+    <option value="3">3 teams</option>
+    <option value="4">4 teams</option>
+  </select>
+
+  <div id="teamInputs" class="team-inputs"></div>
+
+  <button onclick="generateTeams()">Generate Teams</button>
+
+  <h2 id="playersTitle" style="display: none;">Today's Players</h2>
+  <div id="playersList" style="display: none;"></div>
+
+  <div id="output"></div>
+
+  <div class="footer">- By Sparsh🏄🏻🏄🏼🏄🏽🏄🏾🏄🏿🏄‍♂️🏄‍♀️</div>
+
+  <script>
+    let playerNames = [];
+
+    function handleEnter(event) {
+      if (event.key === "Enter") {
+        event.preventDefault();
+        addName();
+      }
+    }
+
+    function addName() {
+      const input = document.getElementById("nameInput");
+      const name = input.value.trim();
+      if (name) {
+        playerNames.push(name);
+        input.value = "";
+        updatePlayersList();
+      }
+    }
+
+    function getRandomBadgeColor() {
+      const colors = ['#ff6b6b', '#6bc5ff', '#6bff95', '#f9ff6b', '#d36bff', '#ff8e6b', '#6bffeb'];
+      return colors[Math.floor(Math.random() * colors.length)];
+    }
+
+    function updatePlayersList() {
+      const title = document.getElementById("playersTitle");
+      const list = document.getElementById("playersList");
+      if (playerNames.length > 0) {
+        title.style.display = "block";
+        list.style.display = "block";
+        list.innerHTML = playerNames.map((name, index) =>
+          `<span class="name-badge" style="background-color:${getRandomBadgeColor()}" onclick="removeName(${index})">${name}</span>`
+        ).join(" ");
+      } else {
+        title.style.display = "none";
+        list.style.display = "none";
+      }
+    }
+
+    function removeName(index) {
+      playerNames.splice(index, 1);
+      updatePlayersList();
+    }
+
+    function showTeamInputs() {
+      const count = parseInt(document.getElementById("teamCount").value);
+      const container = document.getElementById("teamInputs");
+      container.innerHTML = "";
+      for (let i = 1; i <= count; i++) {
+        container.innerHTML += `
+          <label>Enter Team Name ${i}:</label>
+          <input type="text" id="teamName${i}" placeholder="Team ${i}" required />
+          <label class="team-color-label">Pick Team ${i} Color:</label>
+          <input type="color" id="teamColor${i}" value="#00ffcc" />
+        `;
+      }
+    }
+
+    function generateTeams() {
+      const numTeams = parseInt(document.getElementById("teamCount").value);
+      if (playerNames.length < numTeams) {
+        document.getElementById("output").innerHTML = "<p>Not enough players to form that many teams.</p>";
+        return;
+      }
+
+      const teamNames = [], teamColors = [];
+      for (let i = 1; i <= numTeams; i++) {
+        const name = document.getElementById(`teamName${i}`).value.trim();
+        const color = document.getElementById(`teamColor${i}`).value;
+        if (!name) {
+          alert(`Please enter a name for Team ${i}`);
+          return;
+        }
+        teamNames.push(name);
+        teamColors.push(color);
+      }
+
+      const names = [...playerNames];
+      for (let i = names.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [names[i], names[j]] = [names[j], names[i]];
+      }
+
+      const teams = Array.from({ length: numTeams }, () => []);
+      names.forEach((name, index) => {
+        teams[index % numTeams].push(name);
+      });
+
+      let outputHTML = "";
+      teams.forEach((team, i) => {
+        outputHTML += `
+          <div class="team" style="border-left: 6px solid ${teamColors[i]};">
+            <strong style="color: ${teamColors[i]};">${teamNames[i]}:</strong>
+            <div>${team.join(", ")}</div>
+          </div>
+        `;
+      });
+
+      document.getElementById("output").innerHTML = outputHTML;
+    }
+
+    showTeamInputs();
+  </script>
+
+</body>
+</html>

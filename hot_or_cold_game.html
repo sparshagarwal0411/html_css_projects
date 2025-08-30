@@ -1,0 +1,1030 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hot or Cold Game</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #000;
+            color: #fff;
+            font-family: 'Courier New', monospace;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            background-image: 
+                radial-gradient(circle at 20% 80%, rgba(120, 255, 214, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(255, 119, 48, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 40% 40%, rgba(120, 119, 240, 0.1) 0%, transparent 50%);
+        }
+
+        .header {
+            text-align: center;
+            padding: 2rem 0;
+            border-bottom: 2px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .title {
+            font-size: 3rem;
+            font-weight: bold;
+            margin-bottom: 1rem;
+            text-shadow: 0 0 20px currentColor;
+        }
+
+        .hot {
+            color: #ff7730;
+            text-shadow: 0 0 20px #ff7730;
+        }
+
+        .or {
+            color: #fff;
+            margin: 0 1rem;
+        }
+
+        .cold {
+            color: #00ffff;
+            text-shadow: 0 0 20px #00ffff;
+        }
+
+        .emoji {
+            font-size: 2rem;
+            margin: 0 0.5rem;
+        }
+
+        .container {
+            flex: 1;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .game-section {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 2rem;
+            margin: 1rem 0;
+            backdrop-filter: blur(10px);
+        }
+
+        .welcome-section h2 {
+            color: #00ffff;
+            text-align: center;
+            margin-bottom: 1rem;
+            font-size: 2rem;
+            text-shadow: 0 0 10px #00ffff;
+        }
+
+        .input-group {
+            margin: 1rem 0;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #fff;
+            font-weight: bold;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 0.8rem;
+            background: rgba(0, 0, 0, 0.7);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 8px;
+            color: #fff;
+            font-size: 1rem;
+            font-family: inherit;
+            transition: all 0.3s ease;
+        }
+
+        input:focus, select:focus {
+            outline: none;
+            border-color: #00ffff;
+            box-shadow: 0 0 20px rgba(0, 255, 255, 0.3);
+        }
+
+        .btn {
+            background: linear-gradient(45deg, #00ffff, #0080ff);
+            border: none;
+            padding: 0.8rem 2rem;
+            border-radius: 25px;
+            color: #000;
+            font-weight: bold;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin: 0.5rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(0, 255, 255, 0.3);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .btn-quit {
+            background: linear-gradient(45deg, #ff4444, #ff7730);
+            border: none;
+            padding: 0.8rem 2rem;
+            border-radius: 25px;
+            color: #fff;
+            font-weight: bold;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin: 0.5rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .btn-quit:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(255, 68, 68, 0.3);
+        }
+
+        .game-modes {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin: 2rem 0;
+        }
+
+        .mode-btn {
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 15px;
+            padding: 2rem;
+            color: #fff;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+        }
+
+        .mode-btn:hover {
+            border-color: #00ffff;
+            box-shadow: 0 0 30px rgba(0, 255, 255, 0.2);
+            transform: translateY(-5px);
+        }
+
+        .mode-btn.selected {
+            border-color: #00ffff;
+            background: rgba(0, 255, 255, 0.1);
+        }
+
+        .rules {
+            background: rgba(255, 119, 48, 0.1);
+            border-left: 4px solid #ff7730;
+            padding: 1rem;
+            margin: 1rem 0;
+            border-radius: 5px;
+        }
+
+        .feedback {
+            text-align: center;
+            font-size: 2rem;
+            font-weight: bold;
+            margin: 1rem 0;
+            padding: 1rem;
+            border-radius: 10px;
+        }
+
+        .feedback.hot {
+            color: #ff7730;
+            background: rgba(255, 119, 48, 0.1);
+            text-shadow: 0 0 20px #ff7730;
+        }
+
+        .feedback.cold {
+            color: #00ffff;
+            background: rgba(0, 255, 255, 0.1);
+            text-shadow: 0 0 20px #00ffff;
+        }
+
+        .feedback.success {
+            color: #00ff00;
+            background: rgba(0, 255, 0, 0.1);
+            text-shadow: 0 0 20px #00ff00;
+        }
+
+        .attempts {
+            text-align: center;
+            font-size: 1.2rem;
+            margin: 1rem 0;
+            color: #00ffff;
+        }
+
+        .guess-history {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 1rem;
+            margin: 1rem 0;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        .guess-history h4 {
+            color: #00ffff;
+            margin-bottom: 0.5rem;
+            text-align: center;
+        }
+
+        .guess-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.5rem;
+            margin: 0.3rem 0;
+            border-radius: 5px;
+            background: rgba(0, 0, 0, 0.3);
+        }
+
+        .guess-item.hot {
+            border-left: 3px solid #ff7730;
+        }
+
+        .guess-item.cold {
+            border-left: 3px solid #00ffff;
+        }
+
+        .scoreboard {
+            background: rgba(0, 255, 255, 0.1);
+            border: 2px solid rgba(0, 255, 255, 0.3);
+            border-radius: 15px;
+            padding: 1.5rem;
+            margin: 1rem 0;
+            text-align: center;
+        }
+
+        .scoreboard h3 {
+            color: #00ffff;
+            margin-bottom: 1rem;
+            text-shadow: 0 0 10px #00ffff;
+        }
+
+        .score-display {
+            display: grid;
+            grid-template-columns: 1fr auto 1fr;
+            gap: 1rem;
+            align-items: center;
+            margin: 1rem 0;
+        }
+
+        .player-score {
+            padding: 1rem;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            border: 2px solid transparent;
+        }
+
+        .player-score.winner {
+            border-color: #00ff00;
+            background: rgba(0, 255, 0, 0.1);
+        }
+
+        .player-score.active {
+            border-color: #ff7730;
+            background: rgba(255, 119, 48, 0.1);
+        }
+
+        .vs-divider {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #ff7730;
+        }
+
+        .round-indicator {
+            background: rgba(255, 119, 48, 0.1);
+            border: 2px solid #ff7730;
+            border-radius: 10px;
+            padding: 1rem;
+            margin: 1rem 0;
+            text-align: center;
+            color: #ff7730;
+            font-weight: bold;
+        }
+
+        .player-input-section {
+            background: rgba(0, 0, 0, 0.3);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 1.5rem;
+            margin: 1rem 0;
+        }
+
+        .player-input-section.active {
+            border-color: #00ffff;
+            background: rgba(0, 255, 255, 0.05);
+        }
+
+        .qualification-round {
+            background: rgba(255, 119, 48, 0.1);
+            border: 2px solid #ff7730;
+            border-radius: 15px;
+            padding: 2rem;
+            margin: 1rem 0;
+            text-align: center;
+        }
+
+        .qualification-round h3 {
+            color: #ff7730;
+            margin-bottom: 1rem;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .footer {
+            text-align: center;
+            padding: 2rem;
+            border-top: 2px solid rgba(255, 255, 255, 0.1);
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .footer .brand {
+            color: #00ffff;
+            font-weight: bold;
+            text-shadow: 0 0 10px #00ffff;
+        }
+
+        .footer .owner {
+            color: #ff7730;
+            font-weight: bold;
+            text-shadow: 0 0 10px #ff7730;
+        }
+
+        .popup-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.5s ease;
+            backdrop-filter: blur(5px);
+        }
+
+        .popup-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .popup-content {
+            background: linear-gradient(135deg, rgba(0, 0, 0, 0.9), rgba(0, 255, 255, 0.1));
+            border: 2px solid rgba(0, 255, 255, 0.3);
+            border-radius: 20px;
+            padding: 2rem;
+            max-width: 500px;
+            width: 90%;
+            text-align: center;
+            transform: scale(0.7) translateY(50px);
+            transition: all 0.5s ease;
+            box-shadow: 0 20px 40px rgba(0, 255, 255, 0.2);
+        }
+
+        .popup-overlay.active .popup-content {
+            transform: scale(1) translateY(0);
+        }
+
+        .glitch {
+            animation: glitch 2s infinite;
+        }
+
+        @keyframes glitch {
+            0% { transform: translateX(0); }
+            10% { transform: translateX(-2px); }
+            20% { transform: translateX(2px); }
+            30% { transform: translateX(0); }
+            100% { transform: translateX(0); }
+        }
+
+        @media (max-width: 768px) {
+            .title { font-size: 2rem; }
+            .game-modes { grid-template-columns: 1fr; }
+            .container { padding: 1rem; }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="title">
+            <span class="emoji">🔥</span>
+            <span class="hot">HOT</span>
+            <span class="or">OR</span>
+            <span class="cold">COLD</span>
+            <span class="emoji">🧊</span>
+        </div>
+        <div>Number Guessing Game</div>
+    </div>
+
+    <div class="container">
+        <!-- Welcome Section -->
+        <div id="welcomeSection" class="game-section">
+            <h2 class="glitch">Welcome to the Game!</h2>
+            <div class="input-group">
+                <label for="playerName">What's your name?</label>
+                <input type="text" id="playerName" placeholder="Enter your name">
+            </div>
+            <div class="game-modes">
+                <div class="mode-btn" onclick="selectMode('computer')">
+                    <h3>🤖 VS Computer</h3>
+                    <p>Play against AI</p>
+                </div>
+                <div class="mode-btn" onclick="selectMode('multiplayer')">
+                    <h3>👥 Multiplayer</h3>
+                    <p>3-Round Tournament</p>
+                </div>
+            </div>
+            <div style="text-align: center;">
+                <button class="btn" onclick="startGame()">Start Game</button>
+            </div>
+        </div>
+
+        <!-- Game Section -->
+        <div id="gameSection" class="game-section hidden">
+            <!-- Multiplayer Names Input -->
+            <div id="playerNamesSection" class="hidden">
+                <h3 style="color: #00ffff; text-align: center; margin-bottom: 1rem;">👥 Enter Player Names</h3>
+                <div class="player-input-section">
+                    <div class="input-group">
+                        <label for="player1Name">Player 1 Name:</label>
+                        <input type="text" id="player1Name" placeholder="Enter Player 1 name">
+                    </div>
+                </div>
+                <div class="player-input-section">
+                    <div class="input-group">
+                        <label for="player2Name">Player 2 Name:</label>
+                        <input type="text" id="player2Name" placeholder="Enter Player 2 name">
+                    </div>
+                </div>
+                <div style="text-align: center;">
+                    <button class="btn" onclick="startQualification()">Start Qualification</button>
+                </div>
+            </div>
+
+            <!-- Multiplayer Qualification Round -->
+            <div id="qualificationSection" class="qualification-round hidden">
+                <h3>🎯 Qualification Round</h3>
+                <p>Computer has chosen a secret number! Both players guess - whoever gets closer goes first!</p>
+                <div id="qualificationNumber" style="font-size: 1.2rem; margin: 1rem 0; color: #00ffff;">
+                    🎲 Computer's secret number: <span style="color: #ff7730;">[HIDDEN]</span>
+                </div>
+                
+                <div class="player-input-section">
+                    <div class="input-group">
+                        <label id="player1Label">Player 1: Enter your guess (1-100)</label>
+                        <input type="number" id="player1Guess" min="1" max="100">
+                    </div>
+                </div>
+                
+                <div class="player-input-section">
+                    <div class="input-group">
+                        <label id="player2Label">Player 2: Enter your guess (1-100)</label>
+                        <input type="number" id="player2Guess" min="1" max="100">
+                    </div>
+                </div>
+                
+                <div style="text-align: center;">
+                    <button class="btn" onclick="processQualification()">Determine Turn Order</button>
+                </div>
+                
+                <div id="qualificationResult" class="feedback hidden"></div>
+            </div>
+
+            <!-- Scoreboard -->
+            <div id="scoreboard" class="scoreboard hidden">
+                <h3>🏆 Tournament Scoreboard</h3>
+                <div class="round-indicator">
+                    Round <span id="currentRound">1</span> of 3
+                </div>
+                <div class="score-display">
+                    <div id="player1Score" class="player-score">
+                        <div id="player1ScoreName">Player 1</div>
+                        <div style="font-size: 2rem; margin: 0.5rem 0;">
+                            <span id="player1Wins">0</span>
+                        </div>
+                        <div>Wins</div>
+                    </div>
+                    <div class="vs-divider">VS</div>
+                    <div id="player2Score" class="player-score">
+                        <div id="player2ScoreName">Player 2</div>
+                        <div style="font-size: 2rem; margin: 0.5rem 0;">
+                            <span id="player2Wins">0</span>
+                        </div>
+                        <div>Wins</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="rules">
+                <h3>🎯 Game Rules:</h3>
+                <div id="computerRules">
+                    <p>• You have 5 attempts to guess the number (1-100)</p>
+                    <p>• <span class="hot">HOT 🔥</span> - Your guess is HIGHER than the target</p>
+                    <p>• <span class="cold">COLD 🧊</span> - Your guess is LOWER than the target</p>
+                </div>
+                <div id="multiplayerRules" class="hidden">
+                    <p>• <strong>3-Round Tournament:</strong> Best of 3 wins the championship!</p>
+                    <p>• <strong>Qualification:</strong> Closest guess to computer's number goes first</p>
+                    <p>• <strong>Each Round:</strong> One player sets number, other guesses (5 attempts)</p>
+                    <p>• <span class="hot">HOT 🔥</span> - Guess is HIGHER • <span class="cold">COLD 🧊</span> - Guess is LOWER</p>
+                </div>
+            </div>
+
+            <div id="numberInput" class="hidden">
+                <div class="input-group">
+                    <label for="targetNumber" id="numberInputLabel">Choose a number (1-100)</label>
+                    <input type="number" id="targetNumber" min="1" max="100">
+                </div>
+                <div style="text-align: center;">
+                    <button class="btn" onclick="setTargetNumber()">Set Number</button>
+                </div>
+            </div>
+
+            <div id="guessSection" class="hidden">
+                <div class="attempts">Attempt: <span id="currentAttempt">1</span>/5</div>
+                <div class="input-group">
+                    <label for="guess" id="guessLabel">Enter your guess:</label>
+                    <input type="number" id="guess" min="1" max="100" placeholder="1-100">
+                </div>
+                <div style="text-align: center;">
+                    <button class="btn" onclick="makeGuess()">Guess</button>
+                </div>
+                <div id="feedback" class="feedback hidden"></div>
+                
+                <!-- Guess History -->
+                <div id="guessHistory" class="guess-history hidden">
+                    <h4>📋 Previous Guesses</h4>
+                    <div id="guessHistoryList"></div>
+                </div>
+            </div>
+
+            <!-- Tournament Results -->
+            <div id="tournamentResults" class="game-section hidden">
+                <h2 style="color: #00ff00; text-align: center; margin-bottom: 1rem;">🏆 Tournament Champion!</h2>
+                <div id="championDisplay" style="text-align: center; font-size: 2rem; margin: 2rem 0;"></div>
+                <div id="finalScore" style="text-align: center; font-size: 1.2rem; margin: 1rem 0;"></div>
+            </div>
+
+            <div style="text-align: center; margin-top: 2rem;">
+                <button class="btn" onclick="resetGame()" style="background: linear-gradient(45deg, #ff7730, #ff4444);">
+                    🔄 New Game
+                </button>
+                <button class="btn-quit" onclick="quitToHome()">
+                    🏠 Quit to Home
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div class="footer">
+        <div>© <span class="brand">BrainStormer Group</span></div>
+        <div>Owned by <span class="owner">"Sparsh"</span></div>
+        <div><span class="owner">"NSUT ECAM"</span></div>
+    </div>
+
+    <!-- Welcome Popup -->
+    <div id="welcomePopup" class="popup-overlay active">
+        <div class="popup-content">
+            <h2 class="glitch" style="color: #00ffff; margin-bottom: 1rem;">🎮 Welcome to Hot or Cold!</h2>
+            <p style="margin-bottom: 2rem; color: rgba(255, 255, 255, 0.8);">
+                Test your guessing skills in this exciting number game! 
+                Choose your mode and let's see if you can beat the challenge! 🚀
+            </p>
+            <button class="btn" onclick="closeWelcomePopup()">Let's Play! 🎯</button>
+        </div>
+    </div>
+
+    <script>
+        let gameMode = '';
+        let targetNumber = 0;
+        let currentAttempt = 1;
+        let playerName = '';
+        let guessHistory = [];
+        
+        // Multiplayer variables
+        let player1Name = '';
+        let player2Name = '';
+        let player1Score = 0;
+        let player2Score = 0;
+        let currentRound = 1;
+        let currentSetter = '';
+        let currentGuesser = '';
+        let qualificationNumber = 0;
+
+        function closeWelcomePopup() {
+            document.getElementById('welcomePopup').classList.remove('active');
+        }
+
+        function selectMode(mode) {
+            gameMode = mode;
+            document.querySelectorAll('.mode-btn').forEach(btn => btn.classList.remove('selected'));
+            event.target.closest('.mode-btn').classList.add('selected');
+        }
+
+        function startGame() {
+            if (gameMode === 'multiplayer') {
+                document.getElementById('welcomeSection').classList.add('hidden');
+                document.getElementById('gameSection').classList.remove('hidden');
+                document.getElementById('playerNamesSection').classList.remove('hidden');
+                document.getElementById('multiplayerRules').classList.remove('hidden');
+                document.getElementById('computerRules').classList.add('hidden');
+                return;
+            }
+            
+            // Computer mode
+            playerName = document.getElementById('playerName').value.trim();
+            
+            if (!playerName) {
+                alert('Please enter your name!');
+                return;
+            }
+            
+            if (!gameMode) {
+                alert('Please select a game mode!');
+                return;
+            }
+
+            document.getElementById('welcomeSection').classList.add('hidden');
+            document.getElementById('gameSection').classList.remove('hidden');
+
+            if (gameMode === 'computer') {
+                targetNumber = Math.floor(Math.random() * 100) + 1;
+                document.getElementById('guessSection').classList.remove('hidden');
+            }
+        }
+
+        function startQualification() {
+            player1Name = document.getElementById('player1Name').value.trim();
+            player2Name = document.getElementById('player2Name').value.trim();
+            
+            if (!player1Name || !player2Name) {
+                alert('Please enter both player names!');
+                return;
+            }
+            
+            // Update labels and scoreboard
+            document.getElementById('player1Label').textContent = `${player1Name}: Enter your guess (1-100)`;
+            document.getElementById('player2Label').textContent = `${player2Name}: Enter your guess (1-100)`;
+            document.getElementById('player1ScoreName').textContent = player1Name;
+            document.getElementById('player2ScoreName').textContent = player2Name;
+            
+            // Generate qualification number
+            qualificationNumber = Math.floor(Math.random() * 100) + 1;
+            
+            document.getElementById('playerNamesSection').classList.add('hidden');
+            document.getElementById('qualificationSection').classList.remove('hidden');
+            document.getElementById('scoreboard').classList.remove('hidden');
+        }
+
+        function processQualification() {
+            const player1Guess = parseInt(document.getElementById('player1Guess').value);
+            const player2Guess = parseInt(document.getElementById('player2Guess').value);
+            
+            if (!player1Guess || !player2Guess || player1Guess < 1 || player1Guess > 100 || 
+                player2Guess < 1 || player2Guess > 100) {
+                alert('Both players must enter valid numbers between 1 and 100!');
+                return;
+            }
+            
+            const player1Distance = Math.abs(player1Guess - qualificationNumber);
+            const player2Distance = Math.abs(player2Guess - qualificationNumber);
+            
+            const resultDiv = document.getElementById('qualificationResult');
+            resultDiv.classList.remove('hidden');
+            
+            document.getElementById('qualificationNumber').innerHTML = 
+                `🎲 Computer's number was: <span style="color: #00ff00;">${qualificationNumber}</span>`;
+            
+            if (player1Distance < player2Distance) {
+                currentSetter = player1Name;
+                currentGuesser = player2Name;
+                resultDiv.innerHTML = `🎯 ${player1Name} was closer! (${player1Distance} vs ${player2Distance})<br>
+                                     ${player1Name} gets to set the number first!`;
+                resultDiv.className = 'feedback success';
+            } else if (player2Distance < player1Distance) {
+                currentSetter = player2Name;
+                currentGuesser = player1Name;
+                resultDiv.innerHTML = `🎯 ${player2Name} was closer! (${player2Distance} vs ${player1Distance})<br>
+                                     ${player2Name} gets to set the number first!`;
+                resultDiv.className = 'feedback success';
+            } else {
+                // Tie - random choice
+                if (Math.random() < 0.5) {
+                    currentSetter = player1Name;
+                    currentGuesser = player2Name;
+                } else {
+                    currentSetter = player2Name;
+                    currentGuesser = player1Name;
+                }
+                resultDiv.innerHTML = `🤝 It's a tie! Randomly chosen: ${currentSetter} goes first!`;
+                resultDiv.className = 'feedback success';
+            }
+            
+            setTimeout(() => {
+                startMultiplayerRound();
+            }, 3000);
+        }
+
+        function startMultiplayerRound() {
+            document.getElementById('qualificationSection').classList.add('hidden');
+            document.getElementById('numberInput').classList.remove('hidden');
+            document.getElementById('numberInputLabel').textContent = 
+                `${currentSetter}: Choose a number (1-100) for ${currentGuesser} to guess`;
+            
+            updateScoreboardHighlight();
+        }
+
+        function updateScoreboardHighlight() {
+            const player1ScoreDiv = document.getElementById('player1Score');
+            const player2ScoreDiv = document.getElementById('player2Score');
+            
+            player1ScoreDiv.classList.remove('active');
+            player2ScoreDiv.classList.remove('active');
+            
+            if (currentSetter === player1Name) {
+                player1ScoreDiv.classList.add('active');
+            } else {
+                player2ScoreDiv.classList.add('active');
+            }
+        }
+
+        function setTargetNumber() {
+            const input = document.getElementById('targetNumber').value;
+            
+            if (!input || input < 1 || input > 100) {
+                alert('Please enter a valid number between 1 and 100!');
+                return;
+            }
+            
+            targetNumber = parseInt(input);
+            document.getElementById('numberInput').classList.add('hidden');
+            document.getElementById('guessSection').classList.remove('hidden');
+            
+            if (gameMode === 'multiplayer') {
+                document.getElementById('guessLabel').textContent = 
+                    `${currentGuesser}: Enter your guess (1-100)`;
+            }
+        }
+
+        function addToHistory(guess, result) {
+            guessHistory.push({ guess, result });
+            updateHistoryDisplay();
+        }
+
+        function updateHistoryDisplay() {
+            const historyDiv = document.getElementById('guessHistory');
+            const historyList = document.getElementById('guessHistoryList');
+            
+            if (guessHistory.length > 0) {
+                historyDiv.classList.remove('hidden');
+                historyList.innerHTML = '';
+                
+                guessHistory.forEach((item, index) => {
+                    const historyItem = document.createElement('div');
+                    historyItem.className = `guess-item ${item.result}`;
+                    historyItem.innerHTML = `
+                        <span>Attempt ${index + 1}: ${item.guess}</span>
+                        <span class="${item.result}">${item.result === 'hot' ? '🔥 HOT' : '🧊 COLD'}</span>
+                    `;
+                    historyList.appendChild(historyItem);
+                });
+            }
+        }
+
+        function makeGuess() {
+            const guessInput = document.getElementById('guess');
+            const guess = parseInt(guessInput.value);
+            
+            if (!guess || guess < 1 || guess > 100) {
+                alert('Please enter a valid number between 1 and 100!');
+                return;
+            }
+
+            const feedbackDiv = document.getElementById('feedback');
+            feedbackDiv.classList.remove('hidden', 'hot', 'cold', 'success');
+
+            if (guess === targetNumber) {
+                if (gameMode === 'multiplayer') {
+                    feedbackDiv.textContent = `🎉 ${currentGuesser} guessed it in ${currentAttempt} attempt${currentAttempt > 1 ? 's' : ''}!`;
+                    // Award point to guesser
+                    if (currentGuesser === player1Name) {
+                        player1Score++;
+                        document.getElementById('player1Wins').textContent = player1Score;
+                    } else {
+                        player2Score++;
+                        document.getElementById('player2Wins').textContent = player2Score;
+                    }
+                    setTimeout(() => {
+                        nextMultiplayerRound();
+                    }, 2000);
+                } else {
+                    feedbackDiv.textContent = `🎉 Congratulations ${playerName}! You guessed it in ${currentAttempt} attempt${currentAttempt > 1 ? 's' : ''}!`;
+                    endGame();
+                }
+                feedbackDiv.classList.add('success');
+                return;
+            }
+
+            let result;
+            if (guess > targetNumber) {
+                feedbackDiv.textContent = '🔥 HOT - Your guess is too high!';
+                feedbackDiv.classList.add('hot');
+                result = 'hot';
+            } else {
+                feedbackDiv.textContent = '🧊 COLD - Your guess is too low!';
+                feedbackDiv.classList.add('cold');
+                result = 'cold';
+            }
+
+            addToHistory(guess, result);
+            currentAttempt++;
+            
+            if (currentAttempt > 5) {
+                if (gameMode === 'multiplayer') {
+                    feedbackDiv.textContent = `😞 ${currentGuesser} couldn't guess it! The number was ${targetNumber}`;
+                    // Award point to setter
+                    if (currentSetter === player1Name) {
+                        player1Score++;
+                        document.getElementById('player1Wins').textContent = player1Score;
+                    } else {
+                        player2Score++;
+                        document.getElementById('player2Wins').textContent = player2Score;
+                    }
+                    setTimeout(() => {
+                        nextMultiplayerRound();
+                    }, 2000);
+                } else {
+                    feedbackDiv.textContent = `😞 Game Over! The number was ${targetNumber}`;
+                    endGame();
+                }
+                feedbackDiv.classList.remove('hot', 'cold');
+                feedbackDiv.classList.add('success');
+                return;
+            }
+
+            document.getElementById('currentAttempt').textContent = currentAttempt;
+            guessInput.value = '';
+            guessInput.focus();
+        }
+
+        function nextMultiplayerRound() {
+            currentRound++;
+            
+            // Check if tournament is over
+            if (currentRound > 3) {
+                endTournament();
+                return;
+            }
+            
+            // Switch roles
+            const temp = currentSetter;
+            currentSetter = currentGuesser;
+            currentGuesser = temp;
+            
+            // Reset round state
+            currentAttempt = 1;
+            guessHistory = [];
+            
+            // Update UI
+            document.getElementById('currentRound').textContent = currentRound;
+            document.getElementById('currentAttempt').textContent = '1';
+            document.getElementById('guessSection').classList.add('hidden');
+            document.getElementById('feedback').classList.add('hidden');
+            document.getElementById('guessHistory').classList.add('hidden');
+            document.getElementById('guessHistoryList').innerHTML = '';
+            document.getElementById('targetNumber').value = '';
+            document.getElementById('guess').value = '';
+            
+            startMultiplayerRound();
+        }
+
+        function endTournament() {
+            document.getElementById('guessSection').classList.add('hidden');
+            document.getElementById('scoreboard').classList.add('hidden');
+            document.getElementById('tournamentResults').classList.remove('hidden');
+            
+            let champion;
+            if (player1Score > player2Score) {
+                champion = player1Name;
+                document.getElementById('player1Score').classList.add('winner');
+            } else if (player2Score > player1Score) {
+                champion = player2Name;
+                document.getElementById('player2Score').classList.add('winner');
+            } else {
+                champion = "It's a Tie!";
+            }
+            
+            document.getElementById('championDisplay').innerHTML = 
+                `🏆 <span style="color: #00ff00;">${champion}</span> ${champion.includes('Tie') ? '' : 'Wins!'}`;
+            document.getElementById('finalScore').innerHTML = 
+                `Final Score: ${player1Name} ${player1Score} - ${player2Score} ${player2Name}`;
+        }
+
+        function endGame() {
+            if (gameMode === 'computer') {
+                const guessBtn = document.querySelector('#guessSection .btn');
+                if (guessBtn) guessBtn.style.display = 'none';
+            }
+        }
+
+        function quitToHome() {
+            resetGame();
+        }
+
+        function resetGame() {
+            gameMode = '';
+            targetNumber = 0;
+            currentAttempt = 1;
+            playerName = '';
+            guessHistory = [];
+            player1Name = '';
+            player2Name = '';
+            player1Score = 0;
+            player2Score = 0;
+            currentRound = 1;
+            currentSetter = '';
+            currentGuesser = '';
+            qualificationNumber = 0;
+            
+            // Reset all sections
+            document.getElementById('welcomeSection').classList.remove('hidden');
+            document.getElementById('gameSection').classList.add('hidden');
+            document.getElementById('playerNamesSection').classList.add('hidden');
+            document.getElementById('qualificationSection').classList.add('hidden');
+            document.getElementById('scoreboard').classList.add('hidden');
+            document.getElementById('numberInput').classList.add('hidden');
+            document.getElementById('guessSection').classList.add('hidden');
+            document.getElementById('feedback').classList.add('hidden');
+            document.getElementById('guessHistory').classList.add('hidden');
+            document.getElementById('tournamentResults').classList.add('hidden');
+            document.getElementById('multiplayerRules').classList.add('hidden');
+            document.getElementById('computerRules').classList.remove('hidden');
+            
+            // Reset form inputs
+            document.getElementById('playerName').value = '';
+            document.getElementById('player1Name').value = '';
+            document.getElementById('player2Name').value = '';
+            document.getElementById('player1Guess').value = '';
+            document.getElementById('player2Guess').value = '';
+            document.getElementById('targetNumber').value = '';
+            document.getElementById('guess').value = '';
+            
+            // Reset scoreboard
+            document.getElementById('currentRound').textContent = '1';
+            document.getElementById('player1Wins').textContent = '0';
+            document.getElementById('player2Wins').textContent = '0';
+            document.getElementById('currentAttempt').textContent = '1';
+            document.getElementById('guessHistoryList').innerHTML = '';
+            
+            // Reset classes
+            document.querySelectorAll('.mode-btn').forEach(btn => btn.classList.remove('selected'));
+            document.querySelectorAll('.player-score').forEach(score => {
+                score.classList.remove('winner', 'active');
+            });
+            
+            const guessBtn = document.querySelector('#guessSection .btn');
+            if (guessBtn) guessBtn.style.display = 'inline-block';
+        }
+
+        // Allow Enter key to submit
+        document.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                if (!document.getElementById('welcomeSection').classList.contains('hidden')) {
+                    startGame();
+                } else if (!document.getElementById('playerNamesSection').classList.contains('hidden')) {
+                    startQualification();
+                } else if (!document.getElementById('qualificationSection').classList.contains('hidden')) {
+                    processQualification();
+                } else if (!document.getElementById('numberInput').classList.contains('hidden')) {
+                    setTargetNumber();
+                } else if (!document.getElementById('guessSection').classList.contains('hidden')) {
+                    makeGuess();
+                }
+            }
+        });
+
+        // Focus management
+        document.getElementById('playerName').focus();
+    </script>
+</body>
+</html>

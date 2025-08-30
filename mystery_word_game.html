@@ -1,0 +1,512 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🤔 Mystery Word ❓</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            background: #000;
+            color: #00ff41;
+            font-family: 'Orbitron', monospace;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background-image: 
+                radial-gradient(circle at 20% 50%, #001a0d 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, #001a1a 0%, transparent 50%),
+                radial-gradient(circle at 40% 80%, #0d1a00 0%, transparent 50%);
+            animation: backgroundPulse 4s ease-in-out infinite alternate;
+        }
+        
+        @keyframes backgroundPulse {
+            0% { background-color: #000; }
+            100% { background-color: #050505; }
+        }
+        
+        .container {
+            max-width: 600px;
+            padding: 20px;
+            text-align: center;
+            border: 2px solid #00ff41;
+            border-radius: 20px;
+            background: rgba(0, 0, 0, 0.9);
+            box-shadow: 
+                0 0 20px #00ff41,
+                inset 0 0 20px rgba(0, 255, 65, 0.1);
+            backdrop-filter: blur(10px);
+            animation: containerGlow 2s ease-in-out infinite alternate;
+        }
+        
+        @keyframes containerGlow {
+            0% { box-shadow: 0 0 20px #00ff41, inset 0 0 20px rgba(0, 255, 65, 0.1); }
+            100% { box-shadow: 0 0 40px #00ff41, inset 0 0 30px rgba(0, 255, 65, 0.2); }
+        }
+        
+        .title {
+            font-size: 2.5rem;
+            font-weight: 900;
+            margin-bottom: 10px;
+            text-shadow: 0 0 20px #00ff41;
+            animation: titleFlicker 3s infinite;
+            background: linear-gradient(45deg, #00ff41, #41ff00, #00ff41);
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        @keyframes titleFlicker {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.8; }
+        }
+        
+        .subtitle {
+            font-size: 1.2rem;
+            margin-bottom: 20px;
+            color: #00ccff;
+            text-shadow: 0 0 10px #00ccff;
+        }
+        
+        .welcome-screen, .game-screen {
+            display: none;
+        }
+        
+        .welcome-screen.active, .game-screen.active {
+            display: block;
+        }
+        
+        .input-group {
+            margin: 20px 0;
+        }
+        
+        .neon-input {
+            background: rgba(0, 0, 0, 0.8);
+            border: 2px solid #00ff41;
+            border-radius: 10px;
+            padding: 15px;
+            font-size: 1.1rem;
+            color: #00ff41;
+            font-family: 'Orbitron', monospace;
+            width: 100%;
+            max-width: 300px;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+        
+        .neon-input:focus {
+            outline: none;
+            box-shadow: 0 0 20px #00ff41;
+            background: rgba(0, 255, 65, 0.1);
+        }
+        
+        .neon-button {
+            background: rgba(0, 0, 0, 0.8);
+            border: 2px solid #00ff41;
+            border-radius: 10px;
+            padding: 15px 30px;
+            font-size: 1.1rem;
+            color: #00ff41;
+            font-family: 'Orbitron', monospace;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin: 10px;
+            text-transform: uppercase;
+            font-weight: 700;
+        }
+        
+        .neon-button:hover {
+            background: rgba(0, 255, 65, 0.2);
+            box-shadow: 0 0 30px #00ff41;
+            transform: translateY(-2px);
+        }
+        
+        .rules {
+            text-align: left;
+            margin: 20px 0;
+            padding: 20px;
+            border: 1px solid #ff0066;
+            border-radius: 10px;
+            background: rgba(255, 0, 102, 0.1);
+            box-shadow: 0 0 15px rgba(255, 0, 102, 0.3);
+        }
+        
+        .rules h3 {
+            color: #ff0066;
+            text-shadow: 0 0 10px #ff0066;
+            text-align: center;
+            margin-bottom: 15px;
+            font-size: 1.5rem;
+        }
+        
+        .rules li {
+            margin: 10px 0;
+            list-style: none;
+            position: relative;
+            padding-left: 20px;
+        }
+        
+        .rules li:before {
+            content: "🤖";
+            position: absolute;
+            left: 0;
+        }
+        
+        .game-info {
+            display: flex;
+            justify-content: space-between;
+            margin: 20px 0;
+            font-weight: 700;
+        }
+        
+        .attempts {
+            color: #ffaa00;
+            text-shadow: 0 0 10px #ffaa00;
+        }
+        
+        .guess-container {
+            margin: 20px 0;
+        }
+        
+        .word-display {
+            font-size: 2rem;
+            font-weight: 700;
+            margin: 15px 0;
+            letter-spacing: 0.5em;
+            font-family: 'Courier New', monospace;
+        }
+        
+        .result-display {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin: 15px 0;
+            letter-spacing: 0.3em;
+            font-family: 'Courier New', monospace;
+        }
+        
+        .green { 
+            color: #00ff41; 
+            text-shadow: 0 0 10px #00ff41;
+            background: rgba(0, 255, 65, 0.2);
+            padding: 2px 5px;
+            border-radius: 5px;
+        }
+        
+        .yellow { 
+            color: #ffff00; 
+            text-shadow: 0 0 10px #ffff00;
+            background: rgba(255, 255, 0, 0.2);
+            padding: 2px 5px;
+            border-radius: 5px;
+        }
+        
+        .red { 
+            color: #ff0066; 
+            text-shadow: 0 0 10px #ff0066;
+        }
+        
+        .purple { 
+            color: #cc00ff; 
+            text-shadow: 0 0 10px #cc00ff;
+        }
+        
+        .blue { 
+            color: #00ccff; 
+            text-shadow: 0 0 10px #00ccff;
+        }
+        
+        .thinking {
+            font-size: 3rem;
+            animation: thinking 1s infinite;
+        }
+        
+        @keyframes thinking {
+            0%, 100% { transform: rotate(0deg); }
+            50% { transform: rotate(15deg); }
+        }
+        
+        .mystery-symbols {
+            font-size: 1.5rem;
+            margin: 10px 0;
+            animation: float 2s ease-in-out infinite alternate;
+        }
+        
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            100% { transform: translateY(-10px); }
+        }
+        
+        .previous-guesses {
+            margin: 20px 0;
+            text-align: left;
+        }
+        
+        .guess-item {
+            margin: 10px 0;
+            padding: 10px;
+            border-radius: 5px;
+            background: rgba(255, 255, 255, 0.05);
+            border-left: 3px solid #00ff41;
+        }
+        
+        .victory {
+            color: #00ff41;
+            font-size: 1.5rem;
+            animation: victory 1s infinite;
+        }
+        
+        @keyframes victory {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+        
+        .game-over {
+            color: #ff0066;
+            font-size: 1.2rem;
+        }
+        
+        .credits {
+            margin-top: 20px;
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Welcome Screen -->
+        <div class="welcome-screen active" id="welcomeScreen">
+            <h1 class="title">🤔 MYSTERY WORD ❓</h1>
+            <div class="mystery-symbols">❓🧠💭❓</div>
+            <p class="subtitle">Crack the Code. Find the Word. <span class="thinking">🤔</span></p>
+            
+            <div class="input-group">
+                <input type="text" class="neon-input" id="playerName" placeholder="Enter your name..." maxlength="20">
+            </div>
+            
+            <div class="rules">
+                <h3>*** NEURAL PROTOCOLS ***</h3>
+                <ul>
+                    <li>Decode a 5-letter mystery word 🔍</li>
+                    <li>You have exactly 5 attempts 🎯</li>
+                    <li>Each guess reveals crucial intel 📊</li>
+                    <li><span class="green">GREEN</span> = Perfect position match ✅</li>
+                    <li><span class="yellow">YELLOW</span> = Letter exists, wrong position ⚠️</li>
+                    <li>No color = Letter not in word ❌</li>
+                </ul>
+            </div>
+            
+            <button class="neon-button" onclick="startGame()">🚀 INITIATE SEQUENCE</button>
+        </div>
+
+        <!-- Game Screen -->
+        <div class="game-screen" id="gameScreen">
+            <h1 class="title">🤔 MYSTERY WORD ❓</h1>
+            <div class="mystery-symbols">❓🔮🧩❓</div>
+            
+            <div class="game-info">
+                <span>Player: <span class="blue" id="currentPlayer"></span></span>
+                <span class="attempts">Attempts: <span id="attemptsLeft">5</span>/5</span>
+            </div>
+            
+            <div class="guess-container">
+                <div class="input-group">
+                    <input type="text" class="neon-input" id="guessInput" placeholder="Enter 5-letter word..." maxlength="5">
+                </div>
+                <button class="neon-button" onclick="makeGuess()">🎯 ANALYZE WORD</button>
+            </div>
+            
+            <div id="currentGuess" class="word-display"></div>
+            <div id="currentResult" class="result-display"></div>
+            
+            <div class="previous-guesses" id="previousGuesses"></div>
+            
+            <div id="gameMessage"></div>
+            
+            <div class="credits">
+                <p class="purple">Neural Network powered by <span class="blue">BrainStormer</span> collective</p>
+                <p class="purple">Algorithm designed by <span class="red">SPARSH</span> <span class="thinking">🧠</span></p>
+            </div>
+            
+            <button class="neon-button" onclick="resetGame()" style="margin-top: 20px;">🔄 NEW MYSTERY</button>
+        </div>
+    </div>
+
+    <script>
+        const wordbank = [
+            "about", "other", "which", "their", "there", "first", "would", "these", "click", "price", "state", "email",
+            "world", "music", "after", "video", "where", "books", "links", "years", "order", "items", "group", "under",
+            "games", "could", "great", "hotel", "store", "terms", "right", "local", "those", "using", "phone", "forum",
+            "based", "black", "check", "index", "being", "women", "today", "south", "pages", "found", "house", "photo",
+            "power", "while", "three", "total", "place", "think", "north", "posts", "media", "since", "guide", "board",
+            "white", "small", "times", "sites", "level", "hours", "image", "title", "shall", "class", "still", "money",
+            "every", "visit", "tools", "reply", "value", "press", "learn", "print", "stock", "point", "sales", "large",
+            "table", "start", "model", "human", "movie", "march", "yahoo", "going", "study", "staff", "again", "april",
+            "never", "users", "topic", "below", "zebra", "arise", "zeros"
+        ];
+
+        let currentWord = '';
+        let attempts = 5;
+        let guesses = [];
+        let playerName = '';
+
+        function startGame() {
+            const nameInput = document.getElementById('playerName').value.trim();
+            if (!nameInput) {
+                alert('🤖 Please enter your neural signature (name) to proceed!');
+                return;
+            }
+            
+            playerName = nameInput;
+            document.getElementById('currentPlayer').textContent = playerName;
+            document.getElementById('welcomeScreen').classList.remove('active');
+            document.getElementById('gameScreen').classList.add('active');
+            
+            initializeGame();
+        }
+
+        function initializeGame() {
+            currentWord = wordbank[Math.floor(Math.random() * wordbank.length)].toUpperCase();
+            attempts = 5;
+            guesses = [];
+            document.getElementById('attemptsLeft').textContent = attempts;
+            document.getElementById('guessInput').value = '';
+            document.getElementById('currentGuess').textContent = '';
+            document.getElementById('currentResult').textContent = '';
+            document.getElementById('previousGuesses').innerHTML = '';
+            document.getElementById('gameMessage').innerHTML = '';
+            document.getElementById('guessInput').focus();
+        }
+
+        function makeGuess() {
+            const guessInput = document.getElementById('guessInput');
+            const guess = guessInput.value.toUpperCase().trim();
+            
+            if (guess.length !== 5) {
+                alert('🚨 Neural scan requires exactly 5 characters! Current input: ' + guess.length + ' characters');
+                return;
+            }
+            
+            if (guesses.includes(guess)) {
+                alert('⚠️ Word already analyzed! Neural pathway blocked. Attempt wasted.');
+                attempts--;
+                updateAttemptsDisplay();
+                if (attempts === 0) {
+                    endGame(false);
+                    return;
+                }
+                return;
+            }
+            
+            guesses.push(guess);
+            attempts--;
+            
+            const result = analyzeGuess(guess);
+            displayGuessResult(guess, result);
+            updateAttemptsDisplay();
+            
+            if (guess === currentWord) {
+                endGame(true);
+            } else if (attempts === 0) {
+                endGame(false);
+            }
+            
+            guessInput.value = '';
+        }
+
+        function analyzeGuess(guess) {
+            let result = [];
+            
+            for (let i = 0; i < 5; i++) {
+                if (guess[i] === currentWord[i]) {
+                    result.push({ letter: guess[i], status: 'green' });
+                } else if (currentWord.includes(guess[i])) {
+                    result.push({ letter: guess[i], status: 'yellow' });
+                } else {
+                    result.push({ letter: guess[i], status: 'none' });
+                }
+            }
+            
+            return result;
+        }
+
+        function displayGuessResult(guess, result) {
+            document.getElementById('currentGuess').textContent = `Neural Scan: ${guess}`;
+            
+            let resultHTML = 'Analysis: ';
+            result.forEach(item => {
+                if (item.status === 'green') {
+                    resultHTML += `<span class="green">${item.letter}</span>`;
+                } else if (item.status === 'yellow') {
+                    resultHTML += `<span class="yellow">${item.letter}</span>`;
+                } else {
+                    resultHTML += `<span>-</span>`;
+                }
+            });
+            
+            document.getElementById('currentResult').innerHTML = resultHTML;
+            
+            // Add to previous guesses
+            const previousGuessesDiv = document.getElementById('previousGuesses');
+            const guessItem = document.createElement('div');
+            guessItem.className = 'guess-item';
+            guessItem.innerHTML = `<strong>${guess}</strong> → ${resultHTML.replace('Analysis: ', '')}`;
+            previousGuessesDiv.appendChild(guessItem);
+        }
+
+        function updateAttemptsDisplay() {
+            document.getElementById('attemptsLeft').textContent = attempts;
+        }
+
+        function endGame(victory) {
+            const messageDiv = document.getElementById('gameMessage');
+            
+            if (victory) {
+                messageDiv.innerHTML = `
+                    <div class="victory">
+                        🎉 NEURAL LINK ESTABLISHED! 🎉<br>
+                        Mystery decoded: <span class="green">${currentWord}</span><br>
+                        Solution found in ${6 - attempts} attempts! <span class="thinking">🧠</span>
+                    </div>
+                `;
+            } else {
+                messageDiv.innerHTML = `
+                    <div class="game-over">
+                        ❌ NEURAL OVERLOAD ❌<br>
+                        Mystery word was: <span class="red">${currentWord}</span><br>
+                        System requires recalibration... 🤖
+                    </div>
+                `;
+            }
+        }
+
+        function resetGame() {
+            initializeGame();
+        }
+
+        // Enter key functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            document.getElementById('playerName').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    startGame();
+                }
+            });
+            
+            document.getElementById('guessInput').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    makeGuess();
+                }
+            });
+        });
+    </script>
+</body>
+</html>

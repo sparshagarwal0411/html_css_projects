@@ -1,0 +1,586 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dice Roll Game - BrainStormer</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&display=swap');
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Orbitron', monospace;
+            background: #000000;
+            background-image: 
+                radial-gradient(circle at 20% 50%, #003d5c 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, #001a2e 0%, transparent 50%),
+                radial-gradient(circle at 40% 80%, #002040 0%, transparent 50%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: #00ffff;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        body::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: 
+                linear-gradient(90deg, transparent 49%, #00ffff22 50%, transparent 51%),
+                linear-gradient(0deg, transparent 49%, #00ffff11 50%, transparent 51%);
+            background-size: 40px 40px;
+            pointer-events: none;
+            animation: gridMove 10s linear infinite;
+        }
+
+        @keyframes gridMove {
+            0% { transform: translate(0, 0); }
+            100% { transform: translate(40px, 40px); }
+        }
+
+        .game-container {
+            background: rgba(0, 40, 60, 0.2);
+            backdrop-filter: blur(20px);
+            border: 2px solid #00ffff;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 
+                0 0 50px rgba(0, 255, 255, 0.3),
+                inset 0 0 50px rgba(0, 255, 255, 0.1);
+            text-align: center;
+            max-width: 700px;
+            width: 90%;
+            position: relative;
+            z-index: 10;
+        }
+
+        .game-container::before {
+            content: '';
+            position: absolute;
+            top: -2px;
+            left: -2px;
+            right: -2px;
+            bottom: -2px;
+            background: linear-gradient(45deg, #00ffff, #0080ff, #00ff80, #00ffff);
+            border-radius: 20px;
+            z-index: -1;
+            animation: borderGlow 2s ease-in-out infinite alternate;
+        }
+
+        @keyframes borderGlow {
+            0% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+
+        h1 {
+            font-size: 3em;
+            margin-bottom: 30px;
+            font-weight: 900;
+            color: #00ffff;
+            text-shadow: 
+                0 0 10px #00ffff,
+                0 0 20px #00ffff,
+                0 0 40px #00ffff;
+            animation: titlePulse 2s ease-in-out infinite alternate;
+        }
+
+        @keyframes titlePulse {
+            0% { text-shadow: 0 0 10px #00ffff, 0 0 20px #00ffff, 0 0 40px #00ffff; }
+            100% { text-shadow: 0 0 20px #00ffff, 0 0 30px #00ffff, 0 0 60px #00ffff; }
+        }
+
+        .question {
+            font-size: 1.3em;
+            margin-bottom: 30px;
+            color: #80ffff;
+            text-shadow: 0 0 10px #80ffff;
+        }
+
+        .buttons {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            margin-bottom: 40px;
+            flex-wrap: wrap;
+        }
+
+        button {
+            padding: 15px 30px;
+            font-size: 1.1em;
+            font-family: 'Orbitron', monospace;
+            font-weight: 700;
+            border: 2px solid #00ffff;
+            border-radius: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            min-width: 150px;
+            background: rgba(0, 255, 255, 0.1);
+            color: #00ffff;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(0, 255, 255, 0.4), transparent);
+            transition: left 0.5s;
+        }
+
+        button:hover::before {
+            left: 100%;
+        }
+
+        button:hover {
+            background: rgba(0, 255, 255, 0.2);
+            box-shadow: 
+                0 0 20px rgba(0, 255, 255, 0.5),
+                inset 0 0 20px rgba(0, 255, 255, 0.1);
+            transform: translateY(-3px);
+        }
+
+        .roll-btn {
+            border-color: #00ff80;
+            color: #00ff80;
+        }
+
+        .roll-btn:hover {
+            background: rgba(0, 255, 128, 0.2);
+            box-shadow: 
+                0 0 20px rgba(0, 255, 128, 0.5),
+                inset 0 0 20px rgba(0, 255, 128, 0.1);
+        }
+
+        .no-btn {
+            border-color: #ff4080;
+            color: #ff4080;
+        }
+
+        .no-btn:hover {
+            background: rgba(255, 64, 128, 0.2);
+            box-shadow: 
+                0 0 20px rgba(255, 64, 128, 0.5),
+                inset 0 0 20px rgba(255, 64, 128, 0.1);
+        }
+
+        .dice-container {
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+            margin: 40px 0;
+            flex-wrap: wrap;
+        }
+
+        .dice {
+            width: 120px;
+            height: 120px;
+            background: #000;
+            border: 3px solid #00ffff;
+            border-radius: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 4em;
+            color: #00ffff;
+            box-shadow: 
+                0 0 30px rgba(0, 255, 255, 0.6),
+                inset 0 0 20px rgba(0, 255, 255, 0.1);
+            animation: rollDice 1s ease-in-out;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .dice::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg, transparent, rgba(0, 255, 255, 0.1), transparent);
+            animation: diceShine 2s linear infinite;
+        }
+
+        @keyframes diceShine {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        @keyframes rollDice {
+            0% { transform: rotateX(0deg) rotateY(0deg) scale(1); }
+            25% { transform: rotateX(90deg) rotateY(90deg) scale(1.1); }
+            50% { transform: rotateX(180deg) rotateY(180deg) scale(0.9); }
+            75% { transform: rotateX(270deg) rotateY(270deg) scale(1.1); }
+            100% { transform: rotateX(360deg) rotateY(360deg) scale(1); }
+        }
+
+        .dice-dots {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            display: grid;
+            padding: 20px;
+            gap: 8px;
+            z-index: 2;
+        }
+
+        .dot {
+            background: #00ffff;
+            border-radius: 50%;
+            width: 15px;
+            height: 15px;
+            box-shadow: 
+                0 0 10px #00ffff,
+                0 0 20px #00ffff;
+            animation: dotGlow 1s ease-in-out infinite alternate;
+        }
+
+        @keyframes dotGlow {
+            0% { box-shadow: 0 0 10px #00ffff, 0 0 20px #00ffff; }
+            100% { box-shadow: 0 0 15px #00ffff, 0 0 30px #00ffff; }
+        }
+
+        .dice-1 .dice-dots { grid-template: 1fr 1fr 1fr / 1fr 1fr 1fr; place-items: center; }
+        .dice-1 .dot:nth-child(5) { display: block; }
+        .dice-1 .dot:not(:nth-child(5)) { display: none; }
+
+        .dice-2 .dice-dots { grid-template: 1fr 1fr 1fr / 1fr 1fr 1fr; }
+        .dice-2 .dot:nth-child(1), .dice-2 .dot:nth-child(9) { display: block; }
+        .dice-2 .dot:not(:nth-child(1)):not(:nth-child(9)) { display: none; }
+
+        .dice-3 .dice-dots { grid-template: 1fr 1fr 1fr / 1fr 1fr 1fr; }
+        .dice-3 .dot:nth-child(1), .dice-3 .dot:nth-child(5), .dice-3 .dot:nth-child(9) { display: block; }
+        .dice-3 .dot:not(:nth-child(1)):not(:nth-child(5)):not(:nth-child(9)) { display: none; }
+
+        .dice-4 .dice-dots { grid-template: 1fr 1fr 1fr / 1fr 1fr 1fr; }
+        .dice-4 .dot:nth-child(1), .dice-4 .dot:nth-child(3), .dice-4 .dot:nth-child(7), .dice-4 .dot:nth-child(9) { display: block; }
+        .dice-4 .dot:not(:nth-child(1)):not(:nth-child(3)):not(:nth-child(7)):not(:nth-child(9)) { display: none; }
+
+        .dice-5 .dice-dots { grid-template: 1fr 1fr 1fr / 1fr 1fr 1fr; }
+        .dice-5 .dot:nth-child(1), .dice-5 .dot:nth-child(3), .dice-5 .dot:nth-child(5), .dice-5 .dot:nth-child(7), .dice-5 .dot:nth-child(9) { display: block; }
+        .dice-5 .dot:not(:nth-child(1)):not(:nth-child(3)):not(:nth-child(5)):not(:nth-child(7)):not(:nth-child(9)) { display: none; }
+
+        .dice-6 .dice-dots { grid-template: 1fr 1fr 1fr / 1fr 1fr; place-items: center; }
+        .dice-6 .dot { display: block; }
+
+        .result {
+            font-size: 1.5em;
+            margin: 30px 0;
+            padding: 25px;
+            background: rgba(0, 255, 255, 0.1);
+            border: 1px solid #00ffff;
+            border-radius: 15px;
+            color: #80ffff;
+            text-shadow: 0 0 10px #80ffff;
+            box-shadow: 0 0 20px rgba(0, 255, 255, 0.3);
+        }
+
+        .sum {
+            font-size: 2em;
+            color: #00ff80;
+            font-weight: 900;
+            margin-top: 15px;
+            text-shadow: 
+                0 0 10px #00ff80,
+                0 0 20px #00ff80;
+            animation: sumPulse 1s ease-in-out infinite alternate;
+        }
+
+        @keyframes sumPulse {
+            0% { transform: scale(1); }
+            100% { transform: scale(1.05); }
+        }
+
+        .credits {
+            margin-top: 40px;
+            font-size: 0.9em;
+            line-height: 1.8;
+            padding: 20px;
+            background: rgba(0, 80, 120, 0.2);
+            border: 1px solid rgba(0, 255, 255, 0.3);
+            border-radius: 10px;
+        }
+
+        .purple { color: #c080ff; text-shadow: 0 0 5px #c080ff; }
+        .blue { color: #40c0ff; text-shadow: 0 0 5px #40c0ff; }
+        .red { color: #ff4080; text-shadow: 0 0 5px #ff4080; }
+        .bold { font-weight: bold; }
+
+        .hidden {
+            display: none;
+        }
+
+        .play-again {
+            margin-top: 30px;
+        }
+
+        .play-again button {
+            background: rgba(0, 255, 128, 0.1);
+            border-color: #00ff80;
+            color: #00ff80;
+        }
+
+        .play-again button:hover {
+            background: rgba(0, 255, 128, 0.2);
+            box-shadow: 
+                0 0 25px rgba(0, 255, 128, 0.6),
+                inset 0 0 25px rgba(0, 255, 128, 0.1);
+        }
+
+        .floating-dice {
+            position: absolute;
+            font-size: 2em;
+            color: rgba(0, 255, 255, 0.3);
+            animation: float 6s ease-in-out infinite;
+            pointer-events: none;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-20px) rotate(180deg); }
+        }
+
+        .floating-dice:nth-child(1) { top: 10%; left: 5%; animation-delay: 0s; }
+        .floating-dice:nth-child(2) { top: 20%; right: 10%; animation-delay: 1s; }
+        .floating-dice:nth-child(3) { bottom: 30%; left: 8%; animation-delay: 2s; }
+        .floating-dice:nth-child(4) { bottom: 15%; right: 5%; animation-delay: 3s; }
+
+        @media (max-width: 600px) {
+            .game-container {
+                padding: 20px;
+                margin: 10px;
+            }
+            
+            h1 {
+                font-size: 2.2em;
+            }
+            
+            .dice-container {
+                gap: 20px;
+            }
+            
+            .dice {
+                width: 100px;
+                height: 100px;
+                font-size: 3em;
+            }
+
+            .buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            button {
+                width: 200px;
+            }
+        }
+
+        /* Particle effect */
+        .particle {
+            position: absolute;
+            width: 3px;
+            height: 3px;
+            background: #00ffff;
+            border-radius: 50%;
+            pointer-events: none;
+            animation: particle 3s linear infinite;
+        }
+
+        @keyframes particle {
+            0% { 
+                transform: translateY(100vh) scale(0);
+                opacity: 1;
+            }
+            100% { 
+                transform: translateY(-100px) scale(1);
+                opacity: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Floating dice decorations -->
+    <div class="floating-dice">🎲</div>
+    <div class="floating-dice">🎲</div>
+    <div class="floating-dice">🎲</div>
+    <div class="floating-dice">🎲</div>
+
+    <div class="game-container">
+        <h1>🎮 DICE ROLL GAME 🎮</h1>
+        
+        <div id="initial-screen">
+            <div class="question">► You want to roll dice? ◄</div>
+            <div class="buttons">
+                <button class="roll-btn" onclick="showOptions()">⚡ YES! LET'S ROLL ⚡</button>
+                <button class="no-btn" onclick="declineGame()">✖ NO THANKS ✖</button>
+            </div>
+        </div>
+
+        <div id="options-screen" class="hidden">
+            <div class="question">► Choose your rolling mode ◄</div>
+            <div class="buttons">
+                <button class="roll-btn" onclick="rollDice(1)">🎲 SINGLE DIE</button>
+                <button class="roll-btn" onclick="rollDice(2)">🎲🎲 DOUBLE DICE</button>
+                <button class="no-btn" onclick="goBack()">⬅ GO BACK</button>
+            </div>
+        </div>
+
+        <div id="result-screen" class="hidden">
+            <div class="dice-container" id="dice-container"></div>
+            <div class="result" id="result"></div>
+            <div class="play-again">
+                <button onclick="playAgain()">🔄 PLAY AGAIN</button>
+            </div>
+        </div>
+
+        <div id="decline-screen" class="hidden">
+            <div class="result">⚠ You chose not to roll dice ⚠</div>
+            <div class="play-again">
+                <button onclick="playAgain()">🎯 CHANGED YOUR MIND?</button>
+            </div>
+        </div>
+
+        <div id="invalid-screen" class="hidden">
+            <div class="result">❌ Invalid response... Please choose from the options! ❌</div>
+            <div class="play-again">
+                <button onclick="playAgain()">🔧 TRY AGAIN</button>
+            </div>
+        </div>
+
+        <div class="credits">
+            <p>Hope you liked it! Thanks for playing.</p>
+            <p><span class="purple">This game was made by</span> <span class="blue bold">BrainStormer</span> <span class="purple">group. Found by</span> <span class="red bold">SPARSH</span></p>
+            <p><span class="purple">Make sure to check out other games on our website.</span></p>
+        </div>
+    </div>
+
+    <script>
+        // Create floating particles
+        function createParticles() {
+            for (let i = 0; i < 20; i++) {
+                setTimeout(() => {
+                    const particle = document.createElement('div');
+                    particle.className = 'particle';
+                    particle.style.left = Math.random() * 100 + 'vw';
+                    particle.style.animationDelay = Math.random() * 3 + 's';
+                    particle.style.animationDuration = (Math.random() * 3 + 2) + 's';
+                    document.body.appendChild(particle);
+
+                    setTimeout(() => {
+                        particle.remove();
+                    }, 5000);
+                }, i * 200);
+            }
+        }
+
+        // Start particle animation
+        setInterval(createParticles, 3000);
+        createParticles();
+
+        function showOptions() {
+            document.getElementById('initial-screen').classList.add('hidden');
+            document.getElementById('options-screen').classList.remove('hidden');
+        }
+
+        function goBack() {
+            document.getElementById('options-screen').classList.add('hidden');
+            document.getElementById('initial-screen').classList.remove('hidden');
+        }
+
+        function declineGame() {
+            document.getElementById('initial-screen').classList.add('hidden');
+            document.getElementById('decline-screen').classList.remove('hidden');
+        }
+
+        function rollDice(numDice) {
+            document.getElementById('options-screen').classList.add('hidden');
+            document.getElementById('result-screen').classList.remove('hidden');
+
+            const diceContainer = document.getElementById('dice-container');
+            const resultDiv = document.getElementById('result');
+            
+            // Clear previous dice
+            diceContainer.innerHTML = '';
+            
+            let total = 0;
+            let results = [];
+
+            for (let i = 0; i < numDice; i++) {
+                const roll = Math.floor(Math.random() * 6) + 1;
+                results.push(roll);
+                total += roll;
+
+                // Create dice element with delay for animation
+                setTimeout(() => {
+                    const dice = document.createElement('div');
+                    dice.className = `dice dice-${roll}`;
+                    
+                    // Create dots
+                    const dotsContainer = document.createElement('div');
+                    dotsContainer.className = 'dice-dots';
+                    
+                    for (let j = 0; j < 9; j++) {
+                        const dot = document.createElement('div');
+                        dot.className = 'dot';
+                        dotsContainer.appendChild(dot);
+                    }
+                    
+                    dice.appendChild(dotsContainer);
+                    diceContainer.appendChild(dice);
+                }, i * 200);
+            }
+
+            // Display results with delay
+            setTimeout(() => {
+                if (numDice === 1) {
+                    resultDiv.innerHTML = `<div>⚡ You rolled: <strong>${results[0]}</strong> ⚡</div>`;
+                } else {
+                    resultDiv.innerHTML = `
+                        <div>⚡ You rolled: <strong>${results[0]}</strong> and <strong>${results[1]}</strong> ⚡</div>
+                        <div class="sum">🎯 Sum: ${total} 🎯</div>
+                    `;
+                }
+            }, 1000);
+        }
+
+        function playAgain() {
+            // Hide all screens
+            document.getElementById('result-screen').classList.add('hidden');
+            document.getElementById('decline-screen').classList.add('hidden');
+            document.getElementById('invalid-screen').classList.add('hidden');
+            document.getElementById('options-screen').classList.add('hidden');
+            
+            // Show initial screen
+            document.getElementById('initial-screen').classList.remove('hidden');
+        }
+
+        // Add click sound effects
+        document.addEventListener('click', function(e) {
+            if (e.target.tagName === 'BUTTON') {
+                // Visual feedback
+                e.target.style.transform = 'scale(0.95)';
+                setTimeout(() => {
+                    e.target.style.transform = '';
+                }, 100);
+            }
+        });
+    </script>
+</body>
+</html>
